@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+body {
+  font-family: "Oswald", sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+/* Oswald font */
+@font-face {
+  font-family: "Oswald";
+  src: url('/fonts/oswald-4.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Permanent Marker font */
+@font-face {
+  font-family: "Permanent Marker";
+  src: url('/fonts/permanent-marker.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
