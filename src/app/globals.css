@@ -2,8 +2,8 @@
 
 body {
   font-family: "Oswald", sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: #f3f3f3;
+  color: #232528;
 }
 
 /* Oswald font */
@@ -16,7 +16,7 @@ body {
 
 /* Permanent Marker font */
 @font-face {
-  font-family: "Permanent Marker";
+  font-family: "Permanent_Marker";
   src: url('/fonts/permanent-marker.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;

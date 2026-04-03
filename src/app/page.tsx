@@ -1,65 +1,100 @@
-import Image from "next/image";
+"use client"
+import React, { useEffect, useState } from 'react'
+import ProductCard from '@/components/product/ProductCard'
+import { Product, Category } from '@/types/product'
+import { productService } from '@/services/services'
+import Link from 'next/link'
 
 export default function Home() {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const products = await productService.getRandomProduct(10);
+        setFeaturedProducts(products);
+
+        const cats = await productService.getCategories();
+        setCategories(cats.slice(0, 6));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="min-h-screen bg-gray-50">
+      <section className="bg-linear-to-r from-[#1e3a5f] to-[#2d5a87] text-white py-20">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">Welcome to Intellix</h1>
+          <p className="text-xl md:text-2xl mb-8 text-gray-200">Discover amazing products at great prices</p>
+          <Link 
+            href="/product-list/list"
+            className="inline-block bg-[#4EE0F4] text-white py-4 px-8 rounded-xl font-bold text-lg hover:bg-[#3dd0e4] transition-colors shadow-lg"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Shop Now
+          </Link>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Shop by Category</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {loading ? (
+            [...Array(6)].map((_, i) => (
+              <div key={i} className="animate-pulse bg-gray-200 h-24 rounded-xl"></div>
+            ))
+          ) : (
+            categories.map((cat, index) => (
+                <Link 
+                  key={`category-${index}`} 
+                  href={`/product-list/list?category=${cat.slug}`}
+                  className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow text-center"
+                >
+                  <p className="font-semibold text-gray-800 capitalize">{cat.name}</p>
+                </Link>
+            ))
+          )}
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-16">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">Featured Products</h2>
+          <Link href="/product-list/list" className="text-[#4EE0F4] hover:underline font-semibold">
+            View All →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {loading ? (
+            [...Array(10)].map((_, i) => (
+              <div key={i} className="animate-pulse bg-gray-200 h-64 rounded-2xl"></div>
+            ))
+          ) : (
+            featuredProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          )}
+        </div>
+      </section>
+
+      <section className="bg-linear-to-r from-[#4EE0F4] to-[#2DD4BF] py-16">
+        <div className="container mx-auto px-4 text-center text-white">
+          <h2 className="text-3xl font-bold mb-4">Ready to Start Shopping?</h2>
+          <p className="text-xl mb-8">Join thousands of happy customers today!</p>
+          <Link 
+            href="/product-list/list"
+            className="inline-block bg-white text-[#4EE0F4] py-4 px-8 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg"
+          >
+            Browse Products
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }
